@@ -1,7 +1,9 @@
+// TODO: MOUSE VACUUM + CONFETTI PILE
 var beingClicked = false;
 var clicks = 0;
 var confettiPosition = [];
 var confettiVelocity = [];
+var confettiTouched = []
 var confettiColor = []
 var dotsPosition = [];
 var dotsVelocity = [];
@@ -75,6 +77,12 @@ function draw() {
         rotate(confettiVelocity[i].heading());
         rect(-5,-2.5,10,5);
         confettiVelocity[i].y += gravity*deltaTime/50;
+        if (confettiTouched[i]) {
+            let mPos = createVector(mouseX-screen.width/2,mouseY-screen.height/2);
+            
+            console.log(p5.Vector.mult(p5.Vector.div(p5.Vector.normalize(p5.Vector.sub(mPos,confettiPosition[i])),dist(mPos.x,mPos.y,confettiPosition[i].x,confettiPosition[i].y)*dist(mPos.x,mPos.y,confettiPosition[i].x,confettiPosition[i].y)),10000));
+            confettiVelocity[i].add(p5.Vector.mult(p5.Vector.div(p5.Vector.normalize(p5.Vector.sub(mPos,confettiPosition[i])),dist(mPos.x,mPos.y,confettiPosition[i].x,confettiPosition[i].y)*dist(mPos.x,mPos.y,confettiPosition[i].x,confettiPosition[i].y)),10000));
+        }
         confettiPosition[i].add(p5.Vector.mult(confettiVelocity[i],deltaTime/50));
         // for (let j = 0; j < confettiPosition.length; j++) {
         //     if (i == j) {
@@ -87,8 +95,16 @@ function draw() {
         //     }
         // }
         if (confettiPosition[i].y >= screen.height/2-5) {
+            console.log("hi")
             confettiPosition[i].y = screen.height/2-5;
             confettiVelocity[i] = createVector(0,0);
+            confettiTouched[i] = true;
+        }
+        if (Math.abs(confettiPosition[i].x) >= screen.width/2) {
+            confettiPosition.splice(i,1);
+            confettiVelocity.splice(i,1);
+            confettiTouched.splice(i,1);
+            confettiColor.splice(i,1);
         }
         pop();
     }
@@ -125,7 +141,6 @@ function draw() {
     // }
 }
 function mousePressed() {
-    console.log(mouseX,mouseY);
     if (mouseX > screen.width/2-50 && mouseX < screen.width/2+50 && mouseY > screen.height/2-25 && mouseY < screen.height/2+25) {
         clicks += 1;
         beingClicked = true;
@@ -163,6 +178,7 @@ function releaseConfetti() {
     for (let i = -25; i <= 25; i++) {
         confettiPosition.push(createVector(0,0));
         confettiVelocity.push(createVector(50*Math.cos(i/100*PI+PI/2)+Math.random()*8-4,-50*Math.sin(i/100*PI+PI/2)+Math.random()*8-4));
+        confettiTouched.push(false);
         let rgb = HSVtoRGB(Math.random(),0.8,1);
         confettiColor.push([rgb.r,rgb.g,rgb.b])
     }

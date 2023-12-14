@@ -76,43 +76,53 @@ function draw() {
         rect(-5,-2.5,10,5);
         confettiVelocity[i].y += gravity*deltaTime/50;
         confettiPosition[i].add(p5.Vector.mult(confettiVelocity[i],deltaTime/50));
-        if (confettiPosition[i].y >= 900) {
-            confettiPosition.splice(i,1);
-            confettiVelocity.splice(i,1);
-            confettiColor.splice(i,1);
-        }
-        pop();
-    }for (let i = 0; i < dotsPosition.length; i++) {
-        push();
-        fill(251, 255, 0);
-        glow(color(251,255,0),30);
-        translate(offset.x,offset.y);
-        translate(dotsPosition[i].x,dotsPosition[i].y);
-        ellipse(-10,-10,20,20);
-        dotsPosition[i].add(p5.Vector.mult(dotsVelocity[i],1));
-        if (dotsPosition[i].x<-screen.width/2+10||dotsPosition[i].x>screen.width/2-10) {
-            dotsVelocity[i].x *= -1;
-        }
-        if (dotsPosition[i].y<-screen.height/2+10||dotsPosition[i].y>screen.height/2-10) {
-            dotsVelocity[i].y *= -1;
-        }
-        for (let j = 0; j < dotsPosition.length; j++) {
-            if (i == j) {
-                continue;
-            }
-            if (dist(dotsPosition[i].x,dotsPosition[i].y,dotsPosition[j].x,dotsPosition[j].y)<=20) {
-                console.log("ok")
-                dotsPosition.splice(i,1);
-                if (i > j) {
-                    dotsPosition.splice(j,1);
-                } else {
-                    dotsPosition.splice(j-1,1);
-                }
-                break;
-            }
+        // for (let j = 0; j < confettiPosition.length; j++) {
+        //     if (i == j) {
+        //         continue;
+        //     }
+        //     if (confettiPosition[i].y < confettiPosition[j].y + 10 && p5.Vector.sub(confettiPosition[i],p5.Vector.mult(confettiVelocity[i],deltaTime/50)).y > confettiPosition[j].y + 10) {
+        //         confettiPosition[i].y = confettiPosition[j].y + 30
+        //         confettiVelocity[i] = createVector(0,0);
+        //         break;
+        //     }
+        // }
+        if (confettiPosition[i].y >= screen.height/2-5) {
+            confettiPosition[i].y = screen.height/2-5;
+            confettiVelocity[i] = createVector(0,0);
         }
         pop();
     }
+    // for (let i = 0; i < dotsPosition.length; i++) {
+    //     push();
+    //     fill(251, 255, 0);
+    //     glow(color(251,255,0),30);
+    //     translate(offset.x,offset.y);
+    //     translate(dotsPosition[i].x,dotsPosition[i].y);
+    //     ellipse(-10,-10,20,20);
+    //     dotsPosition[i].add(p5.Vector.mult(dotsVelocity[i],1));
+    //     if (dotsPosition[i].x<-screen.width/2+10||dotsPosition[i].x>screen.width/2-10) {
+    //         dotsVelocity[i].x *= -1;
+    //     }
+    //     if (dotsPosition[i].y<-screen.height/2+10||dotsPosition[i].y>screen.height/2-10) {
+    //         dotsVelocity[i].y *= -1;
+    //     }
+    //     for (let j = 0; j < dotsPosition.length; j++) {
+    //         if (i == j) {
+    //             continue;
+    //         }
+    //         if (dist(dotsPosition[i].x,dotsPosition[i].y,dotsPosition[j].x,dotsPosition[j].y)<=20) {
+    //             console.log("ok")
+    //             dotsPosition.splice(i,1);
+    //             if (i > j) {
+    //                 dotsPosition.splice(j,1);
+    //             } else {
+    //                 dotsPosition.splice(j-1,1);
+    //             }
+    //             break;
+    //         }
+    //     }
+    //     pop();
+    // }
 }
 function mousePressed() {
     console.log(mouseX,mouseY);

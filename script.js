@@ -94,9 +94,12 @@ function draw() {
             
         }
         if (confettiTouched[i]) {
-            let mPos = createVector(mouseX-screen.width/2,mouseY-screen.height/2);
+            let mPos = createVector(mouseX-screen.width/2,constrain(mouseY-screen.height/2,-screen.height/2,screen.height/2));
             
             let accel = p5.Vector.mult(p5.Vector.div(p5.Vector.normalize(p5.Vector.sub(mPos,confettiPosition[i])),dist(mPos.x,mPos.y,confettiPosition[i].x,confettiPosition[i].y)*dist(mPos.x,mPos.y,confettiPosition[i].x,confettiPosition[i].y)),10000);
+            if (mag(accel.x,accel.y)<1) {
+                accel = createVector(0,0);
+            }
             console.log(mag(accel.x,accel.y))
             confettiVelocity[i].add(accel);
         }

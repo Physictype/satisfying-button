@@ -100,8 +100,10 @@ function draw() {
             if (mag(accel.x,accel.y)<1) {
                 accel = createVector(0,0);
             }
-            console.log(mag(accel.x,accel.y))
             confettiVelocity[i].add(accel);
+            if (dist(confettiPosition[i].x,confettiPosition[i].y,mPos.x,mPos.y)<20) {
+                console.log("WHEEE");
+            }
         }
         confettiPosition[i].add(p5.Vector.mult(confettiVelocity[i],deltaTime/50));
         // for (let j = 0; j < confettiPosition.length; j++) {

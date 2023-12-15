@@ -5,6 +5,7 @@ var confettiPosition = [];
 var confettiVelocity = [];
 var confettiTouched = []
 var confettiColor = []
+var confettiTouchingIndex = [];
 var dotsPosition = [];
 var dotsVelocity = [];
 var gravity = 5;
@@ -74,14 +75,30 @@ function draw() {
         fill(confettiColor[i][0],confettiColor[i][1],confettiColor[i][2]);
         glow(color(confettiColor[i][0],confettiColor[i][1],confettiColor[i][2]),12);
         translate(confettiPosition[i].x,confettiPosition[i].y)
-        rotate(confettiVelocity[i].heading());
+        if (mag(confettiVelocity[i].x,confettiVelocity[i].y) < 0.1) {
+            rotate(0);
+        } else {
+            rotate(confettiVelocity[i].heading());
+        }
         rect(-5,-2.5,10,5);
-        confettiVelocity[i].y += gravity*deltaTime/50;
+        if (confettiTouchingIndex[i]!=-1) {
+            confettiVelocity[i] = createVector(0,0);
+            if (confettiPosition[i].y < screen.height/2-2.5||confettiTouchingIndex[i]>=confettiTouchingIndex.length||!(confettiTouchingIndex[i]==-2||(confettiPosition[i].y > confettiPosition[confettiTouchingIndex[i]].y-5 && confettiPosition[i].y < confettiPosition[confettiTouchingIndex[i]].y+5 && confettiTouched[confettiTouchingIndex[i]] && Math.abs(confettiPosition[i].x-confettiPosition[confettiTouchingIndex[i]].x)<10))) {
+                confettiTouchingIndex[i] = -1;
+            }
+        }
+        
+        if (confettiTouchingIndex[i]==-1) {
+            confettiVelocity[i].y += gravity*deltaTime/50;
+        } else {
+            
+        }
         if (confettiTouched[i]) {
             let mPos = createVector(mouseX-screen.width/2,mouseY-screen.height/2);
             
-            console.log(p5.Vector.mult(p5.Vector.div(p5.Vector.normalize(p5.Vector.sub(mPos,confettiPosition[i])),dist(mPos.x,mPos.y,confettiPosition[i].x,confettiPosition[i].y)*dist(mPos.x,mPos.y,confettiPosition[i].x,confettiPosition[i].y)),10000));
-            confettiVelocity[i].add(p5.Vector.mult(p5.Vector.div(p5.Vector.normalize(p5.Vector.sub(mPos,confettiPosition[i])),dist(mPos.x,mPos.y,confettiPosition[i].x,confettiPosition[i].y)*dist(mPos.x,mPos.y,confettiPosition[i].x,confettiPosition[i].y)),10000));
+            let accel = p5.Vector.mult(p5.Vector.div(p5.Vector.normalize(p5.Vector.sub(mPos,confettiPosition[i])),dist(mPos.x,mPos.y,confettiPosition[i].x,confettiPosition[i].y)*dist(mPos.x,mPos.y,confettiPosition[i].x,confettiPosition[i].y)),10000);
+            console.log(mag(accel.x,accel.y))
+            confettiVelocity[i].add(accel);
         }
         confettiPosition[i].add(p5.Vector.mult(confettiVelocity[i],deltaTime/50));
         // for (let j = 0; j < confettiPosition.length; j++) {
@@ -94,17 +111,40 @@ function draw() {
         //         break;
         //     }
         // }
-        if (confettiPosition[i].y >= screen.height/2-5) {
-            console.log("hi")
-            confettiPosition[i].y = screen.height/2-5;
-            confettiVelocity[i] = createVector(0,0);
-            confettiTouched[i] = true;
+        if (confettiTouchingIndex[i]==-1) {
+            for (let j = 0; j < confettiPosition.length; j++) {
+                if (i == j) {
+                    continue;
+                }
+                if (confettiPosition[i].y > confettiPosition[j].y-5 && confettiPosition[i].y < confettiPosition[j].y+5 && confettiTouched[j] && Math.abs(confettiPosition[i].x-confettiPosition[j].x)<10) {
+        
+                    confettiPosition[i].y = confettiPosition[j].y-5;
+                    confettiVelocity[i] = createVector(0,0);
+                    confettiTouched[i] = true;
+                    confettiTouchingIndex[i] = j;
+                }
+            }
+            if (confettiPosition[i].y >= screen.height/2-2.5) {
+                confettiPosition[i].y = screen.height/2-2.5;
+                confettiVelocity[i] = createVector(0,0);
+                confettiTouched[i] = true;
+                confettiTouchingIndex[i] = -2;
+            }
         }
         if (Math.abs(confettiPosition[i].x) >= screen.width/2) {
             confettiPosition.splice(i,1);
             confettiVelocity.splice(i,1);
             confettiTouched.splice(i,1);
             confettiColor.splice(i,1);
+            confettiTouchingIndex.splice(i,1);
+            for (let j = 0; j < confettiTouchingIndex.length; j++) {
+                if (confettiTouchingIndex[j]==i) {
+                    confettiTouchingIndex[j] = -1;
+                }
+                if (confettiTouchingIndex[j]>i) {
+                    confettiTouchingIndex[j] -= 1;
+                }
+            }
         }
         pop();
     }
@@ -179,6 +219,7 @@ function releaseConfetti() {
         confettiPosition.push(createVector(0,0));
         confettiVelocity.push(createVector(50*Math.cos(i/100*PI+PI/2)+Math.random()*8-4,-50*Math.sin(i/100*PI+PI/2)+Math.random()*8-4));
         confettiTouched.push(false);
+        confettiTouchingIndex.push(-1);
         let rgb = HSVtoRGB(Math.random(),0.8,1);
         confettiColor.push([rgb.r,rgb.g,rgb.b])
     }

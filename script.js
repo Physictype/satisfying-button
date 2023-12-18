@@ -41,6 +41,9 @@ function glow(glowColor, blurriness) {
 
 function draw() {
     background(255);
+    fill(0,0,0)
+    textSize(20);
+    text("FPS: "+Math.round(frameRate()).toString(),5,160);
     translate(offset.x+screen.width/2,offset.y+screen.height/2);
     if (beingClicked) {
         holdTime += deltaTime;
@@ -115,6 +118,23 @@ function draw() {
             confettiVelocity[i].add(accel);
             if (distSquared(confettiPosition[i].x,confettiPosition[i].y,mPos.x,mPos.y)<400) {
                 console.log("WHEEE");
+                if (mouseDown && !beingClicked) {
+                    confettiPosition.splice(i,1);
+                    confettiVelocity.splice(i,1);
+                    confettiTouched.splice(i,1);
+                    confettiColor.splice(i,1);
+                    confettiTouchingIndex.splice(i,1);
+                    for (let j = 0; j < confettiTouchingIndex.length; j++) {
+                        if (confettiTouchingIndex[j]==i) {
+                            confettiTouchingIndex[j] = -1;
+                        }
+                        if (confettiTouchingIndex[j]>i) {
+                            confettiTouchingIndex[j] -= 1;
+                        }
+                    }
+                    pop();
+                    continue;
+                }
             }
         }
         confettiPosition[i].add(p5.Vector.mult(confettiVelocity[i],deltaTime/50));

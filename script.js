@@ -16,11 +16,14 @@ var shaking = false;
 var holdTime = 0;
 var holdTimer = 0;
 var angle = 0;
+var switchMouse = false;
+var mouseDown = false;
 
 function setup() {
     createCanvas(screen.width,screen.height);
     confettiColor.push([255,50,50]);
     offset = createVector(0,0);
+    noCursor();
 }
 function glow(glowColor, blurriness) {
     drawingContext.shadowColor = glowColor;
@@ -28,6 +31,7 @@ function glow(glowColor, blurriness) {
   }
 
 function draw() {
+    background(255);
     translate(offset.x+screen.width/2,offset.y+screen.height/2);
     if (beingClicked) {
         holdTime += deltaTime;
@@ -55,7 +59,6 @@ function draw() {
             offset = createVector(Math.random()*shake*2-shake,Math.random()*shake*2-shake);
         }
     }
-    background(255);
     noStroke();
     if (!beingClicked) {
         fill(117, 184, 255);
@@ -96,7 +99,7 @@ function draw() {
         if (confettiTouched[i]) {
             let mPos = createVector(mouseX-screen.width/2,constrain(mouseY-screen.height/2,-screen.height/2,screen.height/2));
             
-            let accel = p5.Vector.mult(p5.Vector.div(p5.Vector.normalize(p5.Vector.sub(mPos,confettiPosition[i])),dist(mPos.x,mPos.y,confettiPosition[i].x,confettiPosition[i].y)*dist(mPos.x,mPos.y,confettiPosition[i].x,confettiPosition[i].y)),10000);
+            let accel = p5.Vector.mult(p5.Vector.div(p5.Vector.normalize(p5.Vector.sub(mPos,confettiPosition[i])),dist(mPos.x,mPos.y,confettiPosition[i].x,confettiPosition[i].y)*dist(mPos.x,mPos.y,confettiPosition[i].x,confettiPosition[i].y)),Math.pow(-1,switchMouse)*10000);
             if (mag(accel.x,accel.y)<1) {
                 accel = createVector(0,0);
             }
@@ -129,12 +132,12 @@ function draw() {
                     confettiTouchingIndex[i] = j;
                 }
             }
-            if (confettiPosition[i].y >= screen.height/2-2.5) {
-                confettiPosition[i].y = screen.height/2-2.5;
-                confettiVelocity[i] = createVector(0,0);
-                confettiTouched[i] = true;
-                confettiTouchingIndex[i] = -2;
-            }
+        }
+        if (confettiPosition[i].y >= screen.height/2-2.5) {
+            confettiPosition[i].y = screen.height/2-2.5;
+            confettiVelocity[i] = createVector(0,0);
+            confettiTouched[i] = true;
+            confettiTouchingIndex[i] = -2;
         }
         if (Math.abs(confettiPosition[i].x) >= screen.width/2) {
             confettiPosition.splice(i,1);
@@ -153,6 +156,21 @@ function draw() {
         }
         pop();
     }
+    push();
+    if (switchMouse) {
+        fill(255,0,0);
+        glow(color(255,0,0),12);
+    } else {
+        fill(0,255,0);
+        glow(color(0,255,0),20);
+    }
+    if (mouseDown) {
+        circle(mouseX-screen.width/2, mouseY-screen.height/2, 10);
+    } else {
+        circle(mouseX-screen.width/2, mouseY-screen.height/2, 15);
+    }
+    pop();
+    
     // for (let i = 0; i < dotsPosition.length; i++) {
     //     push();
     //     fill(251, 255, 0);
@@ -193,6 +211,13 @@ function mousePressed() {
         shaking=true;
         shakeTime = 0;
         holdTime = 0;
+    }
+    mouseDown = true;
+}
+function keyPressed() {
+    console.log(key)
+    if (key==" ") {
+        switchMouse = !switchMouse;
     }
 }
 function HSVtoRGB(h, s, v) {
@@ -236,4 +261,5 @@ function mouseReleased() {
     beingClicked = false;
     shake = 5;
     glow(color(255,255,255),0);
+    mouseDown = false;
 }

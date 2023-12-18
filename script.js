@@ -28,7 +28,7 @@ function magSquared(x,y) {
 }
 
 function setup() {
-    createCanvas(screen.width,screen.height);
+    createCanvas(screen.width,screen.height-10);
     confettiColor.push([255,50,50]);
     offset = createVector(0,0);
     noCursor();
@@ -43,9 +43,9 @@ function draw() {
     background(255);
     fill(0,0,0)
     textSize(20);
-    text("FPS: "+Math.round(frameRate()).toString(),5,160);
-    text("Click (and hold) the button to release confetti!\nSpace to switch between mouse attracting and repelling.\nClick to erase confetti within a distance.\nHold shift to remove gravity.\n⌘⇧F to make fullscreen.",5,190);
-    translate(offset.x+screen.width/2,offset.y+screen.height/2);
+    text("FPS: "+Math.round(frameRate()).toString(),5,30);
+    text("Click (and hold) the button to release confetti!\nSpace to switch between mouse attracting and repelling.\nClick to erase confetti within a distance.\nHold shift to remove gravity.\nCLICK FOR FULLSCREEN.",5,60);
+    translate(offset.x+screen.width/2,offset.y+screen.height/2-5);
     if (beingClicked) {
         holdTime += deltaTime;
         if (holdTime > 500) {
@@ -99,7 +99,7 @@ function draw() {
         rect(-5,-2.5,10,5);
         if (confettiTouchingIndex[i]!=-1) {
             confettiVelocity[i] = createVector(0,0);
-            if (confettiPosition[i].y < screen.height/2-2.5||confettiTouchingIndex[i]>=confettiTouchingIndex.length||!(confettiTouchingIndex[i]==-2||(confettiPosition[i].y > confettiPosition[confettiTouchingIndex[i]].y-5 && confettiPosition[i].y < confettiPosition[confettiTouchingIndex[i]].y+5 && confettiTouched[confettiTouchingIndex[i]] && Math.abs(confettiPosition[i].x-confettiPosition[confettiTouchingIndex[i]].x)<10))) {
+            if (confettiPosition[i].y < screen.height/2-5-2.5||confettiTouchingIndex[i]>=confettiTouchingIndex.length||!(confettiTouchingIndex[i]==-2||(confettiPosition[i].y > confettiPosition[confettiTouchingIndex[i]].y-5 && confettiPosition[i].y < confettiPosition[confettiTouchingIndex[i]].y+5 && confettiTouched[confettiTouchingIndex[i]] && Math.abs(confettiPosition[i].x-confettiPosition[confettiTouchingIndex[i]].x)<10))) {
                 confettiTouchingIndex[i] = -1;
             }
         }
@@ -110,7 +110,7 @@ function draw() {
             
         }
         if (confettiTouched[i]) {
-            let mPos = createVector(mouseX-screen.width/2,constrain(mouseY-screen.height/2,-screen.height/2,screen.height/2));
+            let mPos = createVector(mouseX-screen.width/2,constrain(mouseY-screen.height/2-5,-screen.height/2+5,screen.height/2-5));
             
             let accel = p5.Vector.mult(p5.Vector.div(p5.Vector.normalize(p5.Vector.sub(mPos,confettiPosition[i])),distSquared(mPos.x,mPos.y,confettiPosition[i].x,confettiPosition[i].y)),Math.pow(-1,switchMouse)*10000);
             if (magSquared(accel.x,accel.y)<1) {
@@ -163,8 +163,8 @@ function draw() {
                 }
             }
         }
-        if (confettiPosition[i].y >= screen.height/2-2.5) {
-            confettiPosition[i].y = screen.height/2-2.5;
+        if (confettiPosition[i].y >= screen.height/2-5-2.5) {
+            confettiPosition[i].y = screen.height/2-5-2.5;
             confettiVelocity[i] = createVector(0,0);
             confettiTouched[i] = true;
             confettiTouchingIndex[i] = -2;
@@ -195,9 +195,9 @@ function draw() {
         glow(color(0,255,0),20);
     }
     if (mouseDown) {
-        circle(mouseX-screen.width/2, mouseY-screen.height/2, 10);
+        circle(mouseX-screen.width/2, mouseY-screen.height/2+5, 10);
     } else {
-        circle(mouseX-screen.width/2, mouseY-screen.height/2, 15);
+        circle(mouseX-screen.width/2, mouseY-screen.height/2+5, 15);
     }
     pop();
     
@@ -234,7 +234,8 @@ function draw() {
     // }
 }
 function mousePressed() {
-    if (mouseX > screen.width/2-50 && mouseX < screen.width/2+50 && mouseY > screen.height/2-25 && mouseY < screen.height/2+25) {
+    document.body.requestFullscreen();
+    if (mouseX > screen.width/2-50 && mouseX < screen.width/2+50 && mouseY > screen.height/2-5-25 && mouseY < screen.height/2-5+25) {
         clicks += 1;
         beingClicked = true;
         releaseConfetti()

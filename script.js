@@ -18,12 +18,21 @@ var holdTimer = 0;
 var angle = 0;
 var switchMouse = false;
 var mouseDown = false;
+var hasGravity = true;
+
+function distSquared(x1,y1,x2,y2) {
+    return (x2-x1)*(x2-x1)+(y2-y1)*(y2-y1);
+}
+function magSquared(x,y) {
+    return x*x+y*y;
+}
 
 function setup() {
     createCanvas(screen.width,screen.height);
     confettiColor.push([255,50,50]);
     offset = createVector(0,0);
     noCursor();
+    p5.disableFriendlyErrors = true;
 }
 function glow(glowColor, blurriness) {
     drawingContext.shadowColor = glowColor;
@@ -91,7 +100,7 @@ function draw() {
             }
         }
         
-        if (confettiTouchingIndex[i]==-1) {
+        if (confettiTouchingIndex[i]==-1 && hasGravity) {
             confettiVelocity[i].y += gravity*deltaTime/50;
         } else {
             
@@ -99,12 +108,12 @@ function draw() {
         if (confettiTouched[i]) {
             let mPos = createVector(mouseX-screen.width/2,constrain(mouseY-screen.height/2,-screen.height/2,screen.height/2));
             
-            let accel = p5.Vector.mult(p5.Vector.div(p5.Vector.normalize(p5.Vector.sub(mPos,confettiPosition[i])),dist(mPos.x,mPos.y,confettiPosition[i].x,confettiPosition[i].y)*dist(mPos.x,mPos.y,confettiPosition[i].x,confettiPosition[i].y)),Math.pow(-1,switchMouse)*10000);
-            if (mag(accel.x,accel.y)<1) {
+            let accel = p5.Vector.mult(p5.Vector.div(p5.Vector.normalize(p5.Vector.sub(mPos,confettiPosition[i])),distSquared(mPos.x,mPos.y,confettiPosition[i].x,confettiPosition[i].y)),Math.pow(-1,switchMouse)*10000);
+            if (magSquared(accel.x,accel.y)<1) {
                 accel = createVector(0,0);
             }
             confettiVelocity[i].add(accel);
-            if (dist(confettiPosition[i].x,confettiPosition[i].y,mPos.x,mPos.y)<20) {
+            if (distSquared(confettiPosition[i].x,confettiPosition[i].y,mPos.x,mPos.y)<400) {
                 console.log("WHEEE");
             }
         }
@@ -218,6 +227,14 @@ function keyPressed() {
     console.log(key)
     if (key==" ") {
         switchMouse = !switchMouse;
+    }
+    if (keyCode==SHIFT) {
+        hasGravity = false;
+    }
+}
+function keyReleased() {
+    if (keyCode==SHIFT) {
+        hasGravity = true;
     }
 }
 function HSVtoRGB(h, s, v) {

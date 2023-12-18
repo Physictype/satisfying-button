@@ -44,6 +44,7 @@ function draw() {
     fill(0,0,0)
     textSize(20);
     text("FPS: "+Math.round(frameRate()).toString(),5,160);
+    text("Click (and hold) the button to release confetti!\nSpace to switch between mouse attracting and repelling.\nClick to erase confetti within a distance.\nHold shift to remove gravity.\n⌘⇧F to make fullscreen.",5,190);
     translate(offset.x+screen.width/2,offset.y+screen.height/2);
     if (beingClicked) {
         holdTime += deltaTime;
@@ -116,7 +117,7 @@ function draw() {
                 accel = createVector(0,0);
             }
             confettiVelocity[i].add(accel);
-            if (distSquared(confettiPosition[i].x,confettiPosition[i].y,mPos.x,mPos.y)<400) {
+            if (distSquared(confettiPosition[i].x,confettiPosition[i].y,mPos.x,mPos.y)<1000) {
                 console.log("WHEEE");
                 if (mouseDown && !beingClicked) {
                     confettiPosition.splice(i,1);
